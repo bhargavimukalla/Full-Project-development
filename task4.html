@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Projects</title>
+  <style>
+    body { 
+      font-family: "Segoe UI", Tahoma, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: #ffe5ec; 
+      color: #333; 
+    }
+
+    .container { 
+      width: 90%; 
+      max-width: 900px; 
+      margin: 20px auto; 
+      background: #fff0f6; 
+      padding: 25px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+    }
+
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { color: #0077b6; margin-bottom: 10px; }
+
+    nav { margin: 15px 0; }
+    nav button { 
+      padding: 10px 18px; 
+      margin: 5px; 
+      border: none; 
+      background: #00b4d8; 
+      color: white; 
+      cursor: pointer; 
+      border-radius: 20px; 
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    nav button:hover { background: #0077b6; }
+
+    section { display: none; }
+    section.active { display: block; animation: fadeIn 0.5s; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    
+    #portfolio { text-align: center; background: #ffe0f0; padding: 15px; border-radius: 10px; }
+    #portfolio h2 { color: #0077b6; }
+    #portfolio p { font-size: 16px; margin: 8px 0; }
+
+    
+    #taskInput { padding: 8px; width: 70%; border: 1px solid #0077b6; border-radius: 6px; }
+    #taskList { list-style: none; padding: 0; }
+    #taskList li { 
+      background: #ffe0f0; /* softer pink for tasks */ 
+      margin: 5px 0; 
+      padding: 8px; 
+      border: 1px solid #ffb3d1; 
+      border-radius: 6px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    #taskList button { background: #ef476f; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 6px; }
+
+   
+    .controls { margin: 10px 0; }
+    .controls select { padding: 6px; border-radius: 6px; border: 1px solid #90e0ef; }
+    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+    .card { 
+      border: 1px solid #ffb3d1; 
+      padding: 15px; 
+      text-align: center; 
+      border-radius: 10px; 
+      background: #ffe0f0; /* lighter pink for product cards */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+    }
+    .card h3 { margin: 5px 0; color: #0077b6; }
+    .card p { margin: 0; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>My Projects</h1>
+      <nav>
+        <button onclick="showSection('portfolio')">Portfolio</button>
+        <button onclick="showSection('todo')">To-Do</button>
+        <button onclick="showSection('products')">Products</button>
+      </nav>
+    </header>
+
+    
+    <section id="portfolio">
+      <h2>About Me</h2>
+      <p>Hello! I am a 3rd year student passionate about web development and software projects.</p>
+      <p><b>Skills:</b> HTML, CSS, JavaScript</p>
+      <p>I enjoy learning new technologies and applying them in real projects.</p>
+    </section>
+
+    
+    <section id="todo">
+      <h2>To-Do List</h2>
+      <input type="text" id="taskInput" placeholder="Enter a task">
+      <button onclick="addTask()">Add</button>
+      <ul id="taskList"></ul>
+    </section>
+
+    
+    <section id="products">
+      <h2>Product Listing</h2>
+      <div class="controls">
+        <label>Filter:</label>
+        <select id="filter" onchange="renderProducts()">
+          <option value="all">All</option>
+          <option value="electronics">Electronics</option>
+          <option value="clothing">Clothing</option>
+        </select>
+        <label>Sort:</label>
+        <select id="sort" onchange="renderProducts()">
+          <option value="default">Default</option>
+          <option value="price-asc">Low to High</option>
+          <option value="price-desc">High to Low</option>
+        </select>
+      </div>
+      <div class="products" id="productList"></div>
+    </section>
+  </div>
+
+  <script>
+    
+    function showSection(id) {
+      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+
+    function loadTasks() {
+      const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      tasks.forEach(t => addTaskToDOM(t));
+    }
+
+    function addTask() {
+      if (taskInput.value.trim() === "") return;
+      addTaskToDOM(taskInput.value);
+      saveTasks();
+      taskInput.value = "";
+    }
+
+    function addTaskToDOM(text) {
+      const li = document.createElement("li");
+      li.innerHTML = `${text} <button onclick="removeTask(this)">X</button>`;
+      taskList.appendChild(li);
+    }
+
+    function removeTask(btn) {
+      btn.parentElement.remove();
+      saveTasks();
+    }
+
+    function saveTasks() {
+      const tasks = [...taskList.children].map(li => li.firstChild.textContent.trim());
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    loadTasks();
+
+    
+    const products = [
+      { name: "Laptop", category: "electronics", price: 800 },
+      { name: "Shirt", category: "clothing", price: 20 },
+      { name: "Phone", category: "electronics", price: 500 },
+      { name: "Jeans", category: "clothing", price: 40 }
+    ];
+
+    function renderProducts() {
+      const filter = document.getElementById("filter").value;
+      const sort = document.getElementById("sort").value;
+      let filtered = [...products];
+
+      if (filter !== "all") filtered = filtered.filter(p => p.category === filter);
+
+      if (sort === "price-asc") filtered.sort((a, b) => a.price - b.price);
+      if (sort === "price-desc") filtered.sort((a, b) => b.price - a.price);
+
+      const container = document.getElementById("productList");
+      container.innerHTML = "";
+      filtered.forEach(p => {
+        container.innerHTML += `<div class="card"><h3>${p.name}</h3><p>Price: $${p.price}</p></div>`;
+      });
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
